@@ -14,7 +14,13 @@ set :background, NORMAL
 
 get '/' do
     guess = params["guess"]
-    message = check_guess guess.to_i
+    cheat = params["cheat"]
+    if cheat
+        settings.background = "yellow"
+        message = "The secret number is " + settings.secret.to_s
+    else
+        message = check_guess guess.to_i
+    end
     erb :index, :locals => {:number => settings.secret, 
                             :message => message,
                             :background => settings.background}
