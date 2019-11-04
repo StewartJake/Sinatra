@@ -1,13 +1,16 @@
 require 'sinatra'
 require 'sinatra/reloader'
 
-SECRET_NUMBER = rand(101)
+secret_number = rand(101)
 WAY_OFF = "DarkRed"
 CLOSE = "DarkOrange"
 RIGHT_ON = "Green"
+NORMAL = "White"
 
-set :secret, SECRET_NUMBER
-set :background, "white"
+set :secret, secret_number
+set :background, NORMAL
+
+@@guesses_remaining = 5
 
 get '/' do
     guess = params["guess"]
@@ -17,7 +20,21 @@ get '/' do
                             :background => settings.background}
 end
 
+def end_game won
+    settings.secret = rand(101)
+    @@gueses_remaining = 5
+    if won
+        "Congratulations. You've guessed it!"
+    else
+        "You've lost"
+    end
+end
+
 def check_guess guess
+    @@guesses_remaining = @@guesses_remaining - 1
+    if @@guesses_remaining == 0
+        return end_game false
+    end
     if guess == 0
         "THE SECRET NUMBER is ***"
     elsif guess > settings.secret + 5
@@ -35,5 +52,6 @@ def check_guess guess
     else
         settings.background = RIGHT_ON
         "THE SECRET NUMBER is " + settings.secret.to_s
+        return end_game true
     end
 end
